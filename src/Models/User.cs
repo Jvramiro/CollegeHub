@@ -1,7 +1,7 @@
 ﻿namespace CollegeHub.Models {
     public enum Role { Student, Teacher, Adm }
     public class User : Entity {
-        public string Name { get; private set; }
+        public string Name { get; set; }
         public string Email { get; private set; }
         public string Password { get; private set; }
         public string CPF { get; private set; }
@@ -19,6 +19,11 @@
             CreatedOn = DateTime.Now;
             EditedOn = DateTime.Now;
             Active = true;
+        }
+
+        public void Update(string Name, string Phone) {
+            this.Name = Name;
+            this.Phone = Phone;
         }
     }
 }
