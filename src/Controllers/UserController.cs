@@ -1,5 +1,6 @@
 ﻿using CollegeHub.Data;
 using CollegeHub.DTO;
+using CollegeHub.Extensions;
 using CollegeHub.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +54,7 @@ namespace CollegeHub.Controllers {
                 return Results.BadRequest("Invalid data");
             }
 
-            var user = new User(request.Name, request.Email, "", request.CPF, request.Phone, request.Role);
+            var user = new User(request.Name, request.Email, request.Password.HashPassword(), request.CPF, request.Phone, request.Role);
 
             await dbContext.User.AddAsync(user);
             await dbContext.SaveChangesAsync();

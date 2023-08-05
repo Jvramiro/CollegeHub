@@ -8,7 +8,7 @@
         public string Phone { get; private set; }
         public Role Role { get; private set; }
 
-        public User(string Name, string Email, string Password, string CPF, string Phone, Role Role, DateTime? EditedOn = null) {
+        public User(string Name, string Email, string Password, string CPF, string Phone, Role Role) {
             this.Name = Name;
             this.Email = Email;
             this.Password = Password;
@@ -17,7 +17,7 @@
             this.Role = Role;
 
             CreatedOn = DateTime.Now;
-            this.EditedOn = EditedOn == null ? DateTime.Now : (DateTime)EditedOn;
+            EditedOn = DateTime.Now;
             Active = true;
         }
     }
