@@ -1,11 +1,9 @@
 ﻿using CollegeHub.Data;
-using CollegeHub.DTO;
 using CollegeHub.DTO.UserDTO;
 using CollegeHub.Extensions;
 using CollegeHub.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
 
 namespace CollegeHub.Controllers
 {
