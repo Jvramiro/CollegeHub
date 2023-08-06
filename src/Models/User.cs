@@ -21,9 +21,10 @@
             Active = true;
         }
 
-        public void Update(string Name, string Phone) {
-            this.Name = Name;
-            this.Phone = Phone;
+        public void Update(string? Name = null, string? Password = null, string? Phone = null) {
+            this.Name = Name ?? this.Name;
+            this.Password = Password ?? this.Password;
+            this.Phone = Phone ?? this.Phone;
         }
     }
 }

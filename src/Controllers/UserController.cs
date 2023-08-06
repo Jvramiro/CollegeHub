@@ -1,12 +1,14 @@
 ﻿using CollegeHub.Data;
 using CollegeHub.DTO;
+using CollegeHub.DTO.UserDTO;
 using CollegeHub.Extensions;
 using CollegeHub.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
-namespace CollegeHub.Controllers {
+namespace CollegeHub.Controllers
+{
     [Route("/[controller]")]
     [ApiController]
     public class UserController : ControllerBase {
@@ -49,7 +51,7 @@ namespace CollegeHub.Controllers {
         }
 
         [HttpPut("{id}")]
-        public async Task<IResult> Update([FromRoute] Guid id, UserRequest request) {
+        public async Task<IResult> Update([FromRoute] Guid id, UserUpdate request) {
 
             //HTTPCONTEXT
             var user = await dbContext.User.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
@@ -58,7 +60,11 @@ namespace CollegeHub.Controllers {
                 return Results.NotFound("Id not found");
             }
 
-            user.Update(request.Name ?? user.Name, request.Phone ?? user.Phone);
+            user.Update(
+                request.Name ?? null,
+                request.Password != null ? request.Password.HashPassword() : null,
+                request.Phone ?? null
+            );
 
             dbContext.User.Update(user);
             await dbContext.SaveChangesAsync();
