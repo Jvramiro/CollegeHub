@@ -2,8 +2,11 @@
 using CollegeHub.DTO.UserDTO;
 using CollegeHub.Extensions;
 using CollegeHub.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace CollegeHub.Controllers
 {
@@ -17,6 +20,24 @@ namespace CollegeHub.Controllers
         }
 
         [HttpGet]
+        [Authorize]
+        public async Task<IResult> GetCurrentUser() {
+
+            var userId = HttpContext.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            var user = await dbContext.User.FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
+
+            if (user == null) {
+                return Results.Problem("Current stored Id not found in database");
+            }
+
+            var response = new UserResponse(user.Name, user.Email, user.Role.ToString(), user.Active);
+            return Results.Ok(response);
+
+        }
+
+        [HttpGet("GetAll")]
+        [Authorize(Roles = "Adm")]
         public async Task<IResult> GetAll(int page = 1, int rows = 30) {
 
             if(rows > 100) {
@@ -29,12 +50,13 @@ namespace CollegeHub.Controllers
                 return Results.BadRequest("No user found");
             }
 
-            var response = users.Select(u => new UserResponse(u.Name, u.Email, u.Role, u.Active));
+            var response = users.Select(u => new UserResponse(u.Name, u.Email, u.Role.ToString(), u.Active));
             return Results.Ok(response);
 
         }
 
-        [HttpGet("{id}")]        
+        [HttpGet("id/{id}")]
+        [Authorize(Roles = "Adm")]
         public async Task<IResult> GetUserById([FromRoute] Guid id) {
 
             var user = await dbContext.User.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
@@ -43,12 +65,13 @@ namespace CollegeHub.Controllers
                 return Results.NotFound("Id not found");
             }
 
-            var response = new UserResponse(user.Name, user.Email, user.Role, user.Active);
+            var response = new UserResponse(user.Name, user.Email, user.Role.ToString(), user.Active);
             return Results.Ok(response);
 
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Adm")]
         public async Task<IResult> Update([FromRoute] Guid id, UserUpdate request) {
 
             //HTTPCONTEXT
@@ -67,12 +90,13 @@ namespace CollegeHub.Controllers
             dbContext.User.Update(user);
             await dbContext.SaveChangesAsync();
 
-            var response = new UserResponse(user.Name, user.Email, user.Role, user.Active);
+            var response = new UserResponse(user.Name, user.Email, user.Role.ToString(), user.Active);
             return Results.Ok(response);
 
         }
 
-        [HttpPost("{id}")]
+        [HttpPost]
+        [Authorize(Roles = "Adm")]
         public async Task<IResult> Create(UserRequest request) {
 
             if (!ModelState.IsValid) {

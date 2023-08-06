@@ -1,9 +1,9 @@
 using CollegeHub.Data;
+using CollegeHub.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Diagnostics;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +15,18 @@ builder.Services.AddAuthorization(options => {
         .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
         .RequireAuthenticatedUser()
         .Build();
+    options.AddPolicy(Role.Student.ToString(), policy => {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("role", Role.Student.ToString());
+    });
+    options.AddPolicy(Role.Teacher.ToString(), policy => {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("role", Role.Teacher.ToString());
+    });
+    options.AddPolicy(Role.Adm.ToString(), policy => {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("role", Role.Adm.ToString());
+    });
 });
 
 builder.Services.AddAuthentication(options => {

@@ -9,9 +9,11 @@ namespace CollegeHub.Services {
 
         public static string GenerateToken(string Email, Guid Id, Role role, IConfiguration configuration) {
 
+            Console.WriteLine(Id);
+
             var claims = new Claim[] {
                 new Claim(ClaimTypes.Email, Email),
-                new Claim(ClaimTypes.NameIdentifier, Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, Id.ToString().ToUpper()),
                 new Claim(ClaimTypes.Role, role.ToString())
             };
 
