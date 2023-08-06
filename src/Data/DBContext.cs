@@ -17,9 +17,15 @@ namespace CollegeHub.Data {
             modelBuilder.Entity<User>()
                 .Property(p=> p.Email).HasMaxLength(100).IsRequired();
             modelBuilder.Entity<User>()
+                .HasIndex(e => e.Email).IsUnique();
+            modelBuilder.Entity<User>()
                 .Property(p => p.Password).HasMaxLength(50).IsRequired();
             modelBuilder.Entity<User>()
+                .HasIndex(e => e.Password).IsUnique();
+            modelBuilder.Entity<User>()
                 .Property(p => p.CPF).HasMaxLength(14).IsRequired();
+            modelBuilder.Entity<User>()
+                .HasIndex(e => e.CPF).IsUnique();
             modelBuilder.Entity<User>()
                 .Property(p => p.Phone).HasMaxLength(20).IsRequired();
             modelBuilder.Entity<User>()
