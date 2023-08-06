@@ -1,9 +1,12 @@
 using CollegeHub.Data;
+using CollegeHub.Extensions;
 using CollegeHub.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SQLitePCL;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -56,5 +59,11 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseExceptionHandler("/error");
+app.Map("/error", (HttpContext httpContext) => {
+    var error = httpContext.Features?.Get<IExceptionHandlerFeature>()?.Error;
+    return ErrorExtensions.GetErrorMessage(error);
+});
 
 app.Run();
