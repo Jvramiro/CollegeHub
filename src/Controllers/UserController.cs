@@ -76,8 +76,6 @@ namespace CollegeHub.Controllers
 
             var user = await dbContext.User.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
 
-            var editedBy = HttpContext.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
-
             if (user == null) {
                 return Results.NotFound("Id not found");
             }
@@ -89,6 +87,7 @@ namespace CollegeHub.Controllers
                 request.Active ?? null
             );
 
+            var editedBy = HttpContext.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
             user.EditedBy = Guid.Parse(editedBy);
 
             dbContext.User.Update(user);
@@ -107,7 +106,10 @@ namespace CollegeHub.Controllers
                 return Results.BadRequest("Invalid data");
             }
 
-            var user = new User(request.Name, request.Email, request.Password.HashPassword(), request.CPF, request.Phone, request.Role);
+            var createdBy = HttpContext.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            var user = new User(request.Name, request.Email, request.Password.HashPassword(), request.CPF, request.Phone,
+                request.Role, Guid.Parse(createdBy));
 
             await dbContext.User.AddAsync(user);
             await dbContext.SaveChangesAsync();

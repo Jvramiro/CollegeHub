@@ -6,6 +6,7 @@ using CollegeHub.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace CollegeHub.Controllers
 {
@@ -82,6 +83,10 @@ namespace CollegeHub.Controllers
                 examRequest.Subject,
                 value
             );
+
+            var createdBy = HttpContext.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            exam.CreatedBy = Guid.Parse(createdBy);
+            exam.EditedBy = Guid.Parse(createdBy);
 
             await dbContext.Exam.AddAsync(exam);
             await dbContext.SaveChangesAsync();
