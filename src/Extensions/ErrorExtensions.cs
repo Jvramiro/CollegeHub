@@ -28,7 +28,6 @@ namespace CollegeHub.Extensions {
 
             }
 
-
             return Results.Problem(title: error.InnerException?.Message, statusCode: 500);
         }
 

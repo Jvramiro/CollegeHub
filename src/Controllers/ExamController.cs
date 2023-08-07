@@ -1,5 +1,6 @@
 ﻿using CollegeHub.Data;
 using CollegeHub.DTO.ExamDTO;
+using CollegeHub.DTO.QuestionDTO;
 using CollegeHub.DTO.UserDTO;
 using CollegeHub.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -19,10 +20,10 @@ namespace CollegeHub.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Teacher, Adm")]
-        public async Task<IResult> GetAll(int page = 1, int rows = 30) {
+        public async Task<IResult> GetAll(int page = 1, int rows = 10) {
 
-            if (rows > 100) {
-                return Results.BadRequest("The number of rows cannot exceed 100");
+            if (rows > 10) {
+                return Results.BadRequest("The number of rows cannot exceed 10");
             }
 
             var exams = await dbContext.Exam.AsNoTracking().Skip((page - 1) * rows).Take(rows).ToListAsync();
@@ -31,12 +32,12 @@ namespace CollegeHub.Controllers
                 return Results.BadRequest("No Exam found");
             }
 
-            var response = exams.Select(e => new ExamResponse(e.Subject.ToString(), e.Questions, e.Value));
+            var response = exams.Select(e => new ExamResponse(e.Id, e.Subject.ToString(), e.Value));
             return Results.Ok(response);
 
         }
 
-        [HttpGet("id/{id}")]
+        [HttpGet("{id}")]
         [Authorize(Roles = "Teacher, Adm")]
         public async Task<IResult> GetById([FromRoute] Guid id) {
 
@@ -46,7 +47,13 @@ namespace CollegeHub.Controllers
                 return Results.NotFound("Id not found");
             }
 
-            var response = new ExamResponse(exam.Subject.ToString(), exam.Questions, exam.Value);
+            var questions = await dbContext.Question.AsNoTracking().Where(q => q.ExamId == id).ToListAsync();
+
+            if (questions == null) {
+                return Results.NotFound("Invalid Exam");
+            }
+
+            var response = new ExamUnitResponse(exam.Subject.ToString(), questions, exam.Value);
             return Results.Ok(response);
 
         }
@@ -59,15 +66,39 @@ namespace CollegeHub.Controllers
                 return Results.BadRequest("Invalid data");
             }
 
+            decimal individualValue = examRequest.Value / examRequest.Questions.Count;
+            decimal value = examRequest.Value;
+            if (!examRequest.DistributeValue) {
+                try {
+                    individualValue = examRequest.Questions.Sum(q => (decimal)q.IndividualValue);
+                }
+                catch {
+                    return Results.BadRequest("DistributeValue is true and not all questions have valid individual values");
+                }
+            }
+
             var exam = new Exam(
                 examRequest.TeacherId,
                 examRequest.Subject,
-                examRequest.Questions,
-                examRequest.Value,
-                examRequest.DistributeValue
+                value
             );
 
             await dbContext.Exam.AddAsync(exam);
+            await dbContext.SaveChangesAsync();
+
+            var questions = examRequest.Questions.Select(current => new Question(
+                exam.Id,
+                current.Text,
+                current.CorrectAnswer,
+                examRequest.DistributeValue ? individualValue : (decimal)current.IndividualValue,
+                current.AnswerA,
+                current.AnswerB,
+                current.AnswerC,
+                current.AnswerD,
+                current.AnswerE
+            )).ToList();
+
+            await dbContext.Question.AddRangeAsync(questions);
             await dbContext.SaveChangesAsync();
 
             return Results.Created($"Exam created successfully", exam.Id);
