@@ -8,6 +8,8 @@ namespace CollegeHub.Data {
         }
 
         public DbSet<User> User { get; set; }
+        public DbSet<Exam> Exam { get; set; }
+        public DbSet<Question> Question { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             modelBuilder.Entity<User>()
@@ -30,6 +32,29 @@ namespace CollegeHub.Data {
                 .Property(p => p.Phone).HasMaxLength(20).IsRequired();
             modelBuilder.Entity<User>()
                 .Property(p => p.Role).IsRequired();
+
+            modelBuilder.Entity<Exam>()
+                .HasKey(e => e.Id);
+            modelBuilder.Entity<Exam>()
+                .Property(p => p.Subject).IsRequired();
+            modelBuilder.Entity<Exam>()
+                .Property(p => p.TeacherId).IsRequired();
+            modelBuilder.Entity<Exam>()
+                .Property(p => p.Value).IsRequired();
+
+            modelBuilder.Entity<Question>()
+                .HasKey(e => e.Id);
+            modelBuilder.Entity<Question>()
+                .Property(p => p.ExamId).IsRequired();
+            modelBuilder.Entity<Question>()
+                .Property(p => p.Text).IsRequired();
+            modelBuilder.Entity<Question>()
+                .Property(p => p.AnswerA).IsRequired();
+            modelBuilder.Entity<Question>()
+                .Property(p => p.AnswerB).IsRequired();
+            modelBuilder.Entity<Question>()
+                .Property(p => p.CorrectAnswer).IsRequired();
+
         }
 
     }

@@ -21,10 +21,13 @@
             Active = true;
         }
 
-        public void Update(string? Name = null, string? Password = null, string? Phone = null) {
+        public void Update(string? Name = null, string? Password = null, string? Phone = null, bool? Active = null) {
             this.Name = Name ?? this.Name;
             this.Password = Password ?? this.Password;
             this.Phone = Phone ?? this.Phone;
+            this.Active = Active ?? this.Active;
+
+            EditedOn = DateTime.Now;
         }
     }
 }

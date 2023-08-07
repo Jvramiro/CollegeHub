@@ -84,7 +84,8 @@ namespace CollegeHub.Controllers
             user.Update(
                 request.Name ?? null,
                 request.Password != null ? request.Password.HashPassword() : null,
-                request.Phone ?? null
+                request.Phone ?? null,
+                request.Active ?? null
             );
 
             dbContext.User.Update(user);
