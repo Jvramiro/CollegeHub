@@ -74,8 +74,9 @@ namespace CollegeHub.Controllers
         [Authorize(Roles = "Adm")]
         public async Task<IResult> Update([FromRoute] Guid id, UserUpdate request) {
 
-            //HTTPCONTEXT
             var user = await dbContext.User.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+
+            var editedBy = HttpContext.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
             if (user == null) {
                 return Results.NotFound("Id not found");
@@ -87,6 +88,8 @@ namespace CollegeHub.Controllers
                 request.Phone ?? null,
                 request.Active ?? null
             );
+
+            user.EditedBy = Guid.Parse(editedBy);
 
             dbContext.User.Update(user);
             await dbContext.SaveChangesAsync();
