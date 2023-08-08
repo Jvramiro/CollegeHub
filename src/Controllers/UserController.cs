@@ -2,10 +2,12 @@
 using CollegeHub.DTO.UserDTO;
 using CollegeHub.Extensions;
 using CollegeHub.Models;
+using CollegeHub.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace CollegeHub.Controllers
@@ -110,6 +112,10 @@ namespace CollegeHub.Controllers
 
             var user = new User(request.Name, request.Email, request.Password.HashPassword(), request.CPF, request.Phone,
                 request.Role, Guid.Parse(createdBy));
+
+            if(!ValidateService.ValidateUser(user, out var result)) {
+                return result;
+            }
 
             await dbContext.User.AddAsync(user);
             await dbContext.SaveChangesAsync();
