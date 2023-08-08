@@ -8,7 +8,7 @@
         public string Phone { get; private set; }
         public Role Role { get; private set; }
 
-        public User(string Name, string Email, string Password, string CPF, string Phone, Role Role, Guid? CreatedBy = null) {
+        public User(string Name, string Email, string Password, string CPF, string Phone, Role Role, Guid CreatedBy) {
             this.Name = Name;
             this.Email = Email;
             this.Password = Password;
@@ -16,8 +16,8 @@
             this.Phone = Phone;
             this.Role = Role;
 
-            this.CreatedBy = CreatedBy ?? this.CreatedBy;
-            this.EditedBy = CreatedBy ?? this.CreatedBy;
+            this.CreatedBy = CreatedBy;
+            this.EditedBy = CreatedBy;
             CreatedOn = DateTime.Now;
             EditedOn = DateTime.Now;
             Active = true;
