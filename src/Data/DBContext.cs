@@ -10,6 +10,7 @@ namespace CollegeHub.Data {
         public DbSet<User> User { get; set; }
         public DbSet<Exam> Exam { get; set; }
         public DbSet<Question> Question { get; set; }
+        public DbSet<Activity> Activity { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             modelBuilder.Entity<User>()
@@ -54,6 +55,17 @@ namespace CollegeHub.Data {
                 .Property(p => p.AnswerB).IsRequired();
             modelBuilder.Entity<Question>()
                 .Property(p => p.CorrectAnswer).IsRequired();
+
+            modelBuilder.Entity<Activity>()
+                .HasKey(e => e.Id);
+            modelBuilder.Entity<Activity>()
+                .Property(p => p.StudentId).IsRequired();
+            modelBuilder.Entity<Activity>()
+                .Property(p => p.ExamId).IsRequired();
+            modelBuilder.Entity<Activity>()
+                .Property(p => p.Subject).IsRequired();
+            modelBuilder.Entity<Activity>()
+                .Property(p => p.Grade).IsRequired();
 
         }
 

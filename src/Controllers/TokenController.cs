@@ -21,13 +21,13 @@ namespace CollegeHub.Controllers {
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IResult> Login(LoginRequest request) {
+        public async Task<IActionResult> Login(LoginRequest request) {
 
             var user = await dbContext.User.AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Email == request.Email && u.Password == request.Password.HashPassword());
 
             if (user == null) {
-                return Results.Unauthorized();
+                return Unauthorized();
             }
 
             var token = TokenService.GenerateToken(user.Email, user.Id, user.Role, configuration);
@@ -36,7 +36,7 @@ namespace CollegeHub.Controllers {
                 Token = token
             };
 
-            return Results.Ok(response);
+            return Ok(response);
 
         }
 

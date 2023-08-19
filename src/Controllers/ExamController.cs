@@ -21,50 +21,50 @@ namespace CollegeHub.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Teacher, Adm")]
-        public async Task<IResult> GetAll(int page = 1, int rows = 10) {
+        public async Task<IActionResult> GetAll(int page = 1, int rows = 10) {
 
             if (rows > 10) {
-                return Results.BadRequest("The number of rows cannot exceed 10");
+                return BadRequest("The number of rows cannot exceed 10");
             }
 
             var exams = await dbContext.Exam.AsNoTracking().Skip((page - 1) * rows).Take(rows).ToListAsync();
 
             if (exams == null) {
-                return Results.BadRequest("No Exam found");
+                return BadRequest("No Exam found");
             }
 
             var response = exams.Select(e => new ExamResponse(e.Id, e.Subject.ToString(), e.Value));
-            return Results.Ok(response);
+            return Ok(response);
 
         }
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Teacher, Adm")]
-        public async Task<IResult> GetById([FromRoute] Guid id) {
+        public async Task<IActionResult> GetById([FromRoute] Guid id) {
 
             var exam = await dbContext.Exam.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
 
             if(exam == null) {
-                return Results.NotFound("Id not found");
+                return NotFound("Id not found");
             }
 
             var questions = await dbContext.Question.AsNoTracking().Where(q => q.ExamId == id).ToListAsync();
 
             if (questions == null) {
-                return Results.NotFound("Invalid Exam");
+                return NotFound("Invalid Exam");
             }
 
-            var response = new ExamUnitResponse(exam.Subject.ToString(), questions, exam.Value);
-            return Results.Ok(response);
+            var response = new ExamUnitResponse(exam.Id, exam.Subject.ToString(), questions, exam.Value);
+            return Ok(response);
 
         }
 
         [HttpPost]
         [Authorize(Roles = "Teacher, Adm")]
-        public async Task<IResult> Create(ExamRequest examRequest) {
+        public async Task<IActionResult> Create(ExamRequest examRequest) {
 
             if (!ModelState.IsValid) {
-                return Results.BadRequest("Invalid data");
+                return BadRequest("Invalid data");
             }
 
             decimal individualValue = examRequest.Value / examRequest.Questions.Count;
@@ -74,7 +74,7 @@ namespace CollegeHub.Controllers
                     individualValue = examRequest.Questions.Sum(q => (decimal)q.IndividualValue);
                 }
                 catch {
-                    return Results.BadRequest("DistributeValue is true and not all questions have valid individual values");
+                    return BadRequest("DistributeValue is true and not all questions have valid individual values");
                 }
             }
 
@@ -106,22 +106,22 @@ namespace CollegeHub.Controllers
             await dbContext.Question.AddRangeAsync(questions);
             await dbContext.SaveChangesAsync();
 
-            return Results.Created($"Exam created successfully", exam.Id);
+            return Created($"Exam created successfully", exam.Id);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IResult> Delete([FromRoute] Guid id) {
+        public async Task<IActionResult> Delete([FromRoute] Guid id) {
 
             var exam = await dbContext.Exam.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
 
             if(exam == null) {
-                return Results.NotFound("Id not found");
+                return NotFound("Id not found");
             }
 
             dbContext.Exam.Remove(exam);
             await dbContext.SaveChangesAsync();
 
-            return Results.Ok($"Exam deleted successfully");
+            return Ok($"Exam deleted successfully");
 
         }
 

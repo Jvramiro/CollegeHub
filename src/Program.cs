@@ -51,6 +51,13 @@ builder.Services.AddAuthentication(options => {
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+app.UseCors(options => options.WithOrigins("http://localhost:5213", "https://localhost:7238",
+                                            "http://localhost:8080", "http://127.0.0.1:8080")
+                       .AllowAnyMethod()
+                       .AllowAnyHeader()
+                       .AllowCredentials());
+
 app.UseAuthentication();
 app.UseAuthorization();
 

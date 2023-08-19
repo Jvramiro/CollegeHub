@@ -49,7 +49,7 @@ namespace CollegeHub.Controllers
             var users = await dbContext.User.AsNoTracking().Skip((page - 1) * rows).Take(rows).ToListAsync();
 
             if(users == null) {
-                return Results.BadRequest("No user found");
+                return Results.NotFound("No user found");
             }
 
             var response = users.Select(u => new UserResponse(u.Name, u.Email, u.Role.ToString(), u.Active));
